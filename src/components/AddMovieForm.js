@@ -1,48 +1,70 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useHistory } from "react-router-dom";
-import { Link } from "react-router-dom";
-
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-
-const EditMovieForm = (props) => {
+import { useHistory } from "react-router-dom";
+const AddMovieForm = (props) => {
   const { push } = useHistory();
-  const { id } = useParams();
   const { setMovies } = props;
-  const movies = props.movies;
-  const selectedMovie = movies.filter((movie) => movie.id === id)[0];
-  const [movie, setMovie] = useState({
-    title: selectedMovie.title,
-    director: selectedMovie.director,
-    genre: selectedMovie.genre,
-    metascore: selectedMovie.metascore,
-    description: selectedMovie.description,
-  });
+  const { movies } = props;
 
-  const handleChange = (e) => {
-    setMovie({
-      ...movie,
-      [e.target.name]: e.target.value,
+  const [newMovie, setNewMovie] = useState({
+    title: "",
+    director: "",
+    genre: "",
+    metascore: "",
+    description: "",
+  });
+  const handleChange = (event) => {
+    setNewMovie({
+      ...newMovie,
+      [event.target.name]: event.target.value,
     });
   };
-  const handleSubmit = (e) => {
-    e.preventDefault();
+
+  const handleCancel = () => {
+    setNewMovie({
+      title: "",
+      director: "",
+      genre: "",
+      metascore: "",
+      description: "",
+    });
+  };
+
+  const handleButton = () => {
+    let buttonDisabled = true;
+    const count = movies.filter(
+      (movie) => movie.title === newMovie.title
+    ).length;
+    if (count === 0) {
+      buttonDisabled = false;
+    } else {
+      buttonDisabled = true;
+    }
+    return buttonDisabled;
+  };
+
+  useEffect(() => {
+    handleButton();
+  }, [newMovie]);
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
     axios
-      .put(`http://localhost:9000/api/movies/${id}`, movie)
+      .post("http://localhost:9000/api/movies", newMovie)
       .then((res) => {
         setMovies(res.data);
-        push(`/movies/${selectedMovie.id}`);
+        push("/movies/");
       })
-      .catch((err) => {
-        console.log(err);
-      });
+      .catch((err) => console.log(err));
   };
-  const { title, director, genre, metascore, description } = movie;
+
+  const { title, director, genre, metascore, description } = newMovie;
   return (
     <div className="bg-white rounded-md shadow flex-1">
       <form onSubmit={handleSubmit}>
         <div className="p-5 pb-3 border-b border-zinc-200">
           <h4 className="text-xl font-bold">
-            Düzenleniyor <strong>{movie.title}</strong>
+            Düzenleniyor <strong>{title}</strong>
           </h4>
         </div>
 
@@ -94,19 +116,24 @@ const EditMovieForm = (props) => {
         </div>
 
         <div className="px-5 py-4 border-t border-zinc-200 flex justify-end gap-2">
-          <Link to={`/movies/1`} className="myButton bg-zinc-500">
-            Vazgeç
-          </Link>
+          <button onClick={handleCancel}>Vazgeç</button>
           <button
             type="submit"
             className="myButton bg-green-700 hover:bg-green-600"
+            disabled={handleButton()}
           >
             Ekle
           </button>
+          {handleButton() && (
+            <p>
+              En az 1 maddeyi doldurmanız gerekmektedir. Ayrıca, daha önce
+              eklenen bir film ekleyemezsiniz.{" "}
+            </p>
+          )}
         </div>
       </form>
     </div>
   );
 };
 
-export default EditMovieForm;
+export default AddMovieForm;
