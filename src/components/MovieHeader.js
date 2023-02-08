@@ -1,10 +1,17 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const MovieHeader = () => {
+const MovieHeader = (props) => {
+  const { darkMode } = props;
   return (
-    <div className="flex justify-between items-center shadow rounded-md bg-white p-2 pl-3 my-3">
-      <h2 className="text-zinc-600">IMDB Movie Database</h2>
+    <div
+      className={
+        darkMode
+          ? "flex justify-between items-center shadow rounded-md bg-black p-2 pl-3 my-3 text-white"
+          : "flex justify-between items-center shadow rounded-md bg-white p-2 pl-3 my-3 text-black"
+      }
+    >
+      <h2>IMDB Movie Database</h2>
       <div className="flex items-center gap-2">
         <Link to="/movies" className="myButton bg-blue-600 hover:bg-blue-500">
           Tüm filmler

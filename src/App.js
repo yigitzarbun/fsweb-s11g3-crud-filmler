@@ -15,7 +15,7 @@ const App = (props) => {
   const { push } = useHistory();
   const [movies, setMovies] = useState([]);
   const [favoriteMovies, setFavoriteMovies] = useState([]);
-
+  const [darkMode, setDarkMode] = useState(false);
   useEffect(() => {
     axios
       .get("http://localhost:9000/api/movies")
@@ -47,14 +47,20 @@ const App = (props) => {
     copyFavs.splice(index, 1);
     setFavoriteMovies([...copyFavs]);
   };
+
+  const handleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
+
   return (
     <div>
       <nav className="bg-zinc-800 px-6 py-3">
         <h1 className="text-xl text-white">HTTP / CRUD Film Projesi</h1>
+        <button onClick={handleDarkMode}>Mod</button>
       </nav>
 
       <div className="max-w-4xl mx-auto px-3 pb-4">
-        <MovieHeader />
+        <MovieHeader darkMode={darkMode} />
         <div className="flex flex-col sm:flex-row gap-4">
           <FavoriteMovieList favoriteMovies={favoriteMovies} />
           <Switch>
